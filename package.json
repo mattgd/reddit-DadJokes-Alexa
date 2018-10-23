@@ -1,0 +1,26 @@
+{
+  "name": "reddit-dadjokes-alexa",
+  "version": "1.0.0",
+  "description": "An Alexa skill for reading out reddit.com/r/dadjokes posts.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mattgd/reddit-DadJokes-Alexa.git"
+  },
+  "keywords": [
+    "alexa",
+    "reddit",
+    "joke",
+    "dad",
+    "jokes"
+  ],
+  "author": "Matt Dzwonczyk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mattgd/reddit-DadJokes-Alexa/issues"
+  },
+  "homepage": "https://github.com/mattgd/reddit-DadJokes-Alexa#readme"
+}
