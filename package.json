@@ -22,5 +22,13 @@
   "bugs": {
     "url": "https://github.com/mattgd/reddit-DadJokes-Alexa/issues"
   },
-  "homepage": "https://github.com/mattgd/reddit-DadJokes-Alexa#readme"
+  "homepage": "https://github.com/mattgd/reddit-DadJokes-Alexa#readme",
+  "dependencies": {
+    "ask-sdk-core": "^2.1.0",
+    "ask-sdk-model": "^1.7.1",
+    "snoowrap": "^1.15.2"
+  },
+  "devDependencies": {
+    "dotenv": "^6.1.0"
+  }
 }
