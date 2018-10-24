@@ -59,6 +59,19 @@ const GetJokeHandler = {
   },
 };
 
+const HelpHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return request.type === 'IntentRequest' &&
+           request.intent.name === 'AMAZON.HelpHandler';
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak('To hear a joke, ask reddit Dad Jokes for a joke.')
+      .getResponse();
+  },
+};
+
 const SessionEndedRequestHandler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
@@ -91,6 +104,7 @@ const skillBuilder = Alexa.SkillBuilders.custom();
 exports.handler = skillBuilder
   .addRequestHandlers(
     GetJokeHandler,
+    HelpHandler,
     SessionEndedRequestHandler,
   )
   .addErrorHandlers(ErrorHandler)
