@@ -11,6 +11,7 @@ const reddit = new snoowrap({
 
 const DAD_JOKES_SUBREDDIT = 'dadjokes'
 const SKILL_NAME = 'Reddit Dad Jokes';
+const REPEAT_PHRASE = 'Would you like to hear another joke?';
 
 /**
  * Returns a random integer between min (inclusive) and max (inclusive)
@@ -46,7 +47,8 @@ const GetJokeHandler = {
     // Checks request type
     return request.type === 'LaunchRequest'
       || (request.type === 'IntentRequest'
-        && request.intent.name === 'GetJokeIntent');
+        && (request.intent.name === 'GetJokeIntent'
+        || request.intent.name === 'YesIntent'));
   },
   async handle(handlerInput) {
     const joke = await getJoke();
@@ -54,8 +56,37 @@ const GetJokeHandler = {
     return handlerInput.responseBuilder
       .speak(joke)
       .withSimpleCard(SKILL_NAME, joke)
-      .withShouldEndSession(true)
+      .setSessionAttributes({lastSpeech: joke})
       .getResponse();
+  },
+};
+
+const RepeatHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    // Checks request type
+    return request.type === 'IntentRequest'
+        && request.intent.name === 'RepeatIntent';
+  },
+  async handle(handlerInput) {
+    const lastSpeech = getSessionAttributes()['lastSpeech'];
+
+    return handlerInput.responseBuilder
+      .speak(lastSpeech + ' <break time="2s"/> ' + REPEAT_PHRASE)
+      .listen(REPEAT_PHRASE)
+      .getResponse();
+  },
+};
+
+const NoHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    // Checks request type
+    return request.type === 'IntentRequest'
+        && request.intent.name === 'NoIntent';
+  },
+  async handle(handlerInput) {
+    return handlerInput.responseBuilder.getResponse();
   },
 };
 
@@ -105,7 +136,9 @@ exports.handler = skillBuilder
   .addRequestHandlers(
     GetJokeHandler,
     HelpHandler,
-    SessionEndedRequestHandler,
+    NoHandler,
+    RepeatHandler,
+    SessionEndedRequestHandler
   )
   .addErrorHandlers(ErrorHandler)
   .lambda();
