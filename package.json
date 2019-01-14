@@ -1,6 +1,6 @@
 {
   "name": "reddit-dadjokes-alexa",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An Alexa skill for reading out reddit.com/r/dadjokes posts.",
   "main": "index.js",
   "scripts": {
@@ -24,11 +24,8 @@
   },
   "homepage": "https://github.com/mattgd/reddit-DadJokes-Alexa#readme",
   "dependencies": {
-    "ask-sdk-core": "^2.1.0",
-    "ask-sdk-model": "^1.7.1",
+    "ask-sdk-core": "^2.3.0",
+    "ask-sdk-model": "^1.11.2",
     "snoowrap": "^1.15.2"
-  },
-  "devDependencies": {
-    "dotenv": "^6.1.0"
   }
 }

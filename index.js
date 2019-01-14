@@ -11,33 +11,32 @@ const reddit = new snoowrap({
 
 const DAD_JOKES_SUBREDDIT = 'dadjokes'
 const SKILL_NAME = 'Reddit Dad Jokes';
+const REPROMPT_PHRASE = 'Would you like to hear another joke?';
 
 /**
  * Returns a random integer between min (inclusive) and max (inclusive)
- * Using Math.round() will give you a non-uniform distribution!
+ * @param min The minimum value.
+ * @param max The maximum value.
+ * @returns A random number between min and max.
  */
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 /**
  * Returns a Promise which resolves as a joke from the r/dadjokes subreddit.
  */
-function getJoke() {
-  return new Promise(resolve => {
-    reddit.getSubreddit(DAD_JOKES_SUBREDDIT).getHot().then((listing) => {
-      const submissionIdx = getRandomInt(0, listing.length);
-      const submission = listing[submissionIdx];
-      var title = submission.title.trim();
-      if (!/[.!?,;:]$/.test(title)) {
-        title += '.';
-      }
+const getJoke = () => new Promise(resolve => {
+  reddit.getSubreddit(DAD_JOKES_SUBREDDIT).getHot().then(listing => {
+    const submissionIdx = getRandomInt(0, listing.length);
+    const submission = listing[submissionIdx];
+    var title = submission.title.trim();
+    if (!/[.!?,;:]$/.test(title)) {
+      title += '.';
+    }
 
-      const joke = `${title} ${submission.selftext.trim()}`;
-      resolve(joke);
-    });
+    const joke = `${title} ${submission.selftext.trim()}`;
+    resolve(joke);
   });
-};
+});
 
 // Core functionality for Dad Jokes skill
 const GetJokeHandler = {
@@ -46,15 +45,17 @@ const GetJokeHandler = {
     // Checks request type
     return request.type === 'LaunchRequest'
       || (request.type === 'IntentRequest'
-        && request.intent.name === 'GetJokeIntent');
+        && (request.intent.name === 'GetJokeIntent'
+        || request.intent.name === 'AMAZON.YesIntent'));
   },
   async handle(handlerInput) {
     const joke = await getJoke();
+    const speakText = `${joke} <break time="2s"/> ${REPROMPT_PHRASE}`
 
     return handlerInput.responseBuilder
-      .speak(joke)
+      .speak(speakText)
       .withSimpleCard(SKILL_NAME, joke)
-      .withShouldEndSession(true)
+      .reprompt(REPROMPT_PHRASE)
       .getResponse();
   },
 };
@@ -70,6 +71,19 @@ const HelpHandler = {
       .speak('To hear a joke, ask reddit Dad Jokes for a joke.')
       .getResponse();
   },
+};
+
+const CancelAndStopIntentHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return request.type === 'IntentRequest'
+      && (request.intent.name === 'AMAZON.CancelIntent'
+        || request.intent.name === 'AMAZON.StopIntent'
+        || request.intent.name === 'AMAZON.NoIntent');
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder.getResponse();
+  }
 };
 
 const SessionEndedRequestHandler = {
@@ -103,9 +117,10 @@ const skillBuilder = Alexa.SkillBuilders.custom();
 
 exports.handler = skillBuilder
   .addRequestHandlers(
+    CancelAndStopIntentHandler,
     GetJokeHandler,
     HelpHandler,
-    SessionEndedRequestHandler,
+    SessionEndedRequestHandler
   )
   .addErrorHandlers(ErrorHandler)
   .lambda();
